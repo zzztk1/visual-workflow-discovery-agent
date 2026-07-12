@@ -1,0 +1,9 @@
+{
+  "name": "visual-workflow-discovery-agent",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "python -m compileall src",
+    "qa:model": "python qa_model.py"
+  }
+}

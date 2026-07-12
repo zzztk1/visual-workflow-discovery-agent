@@ -11,6 +11,7 @@ venv/
 output/
 outputs/
 work/
+MODEL_QA_RUN.*
 web/_rollback/
 scripts/
 packaged_samples/
