@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 
-DEFAULT_STEPFUN_BASE = "https://api.stepfun.com/step_plan/v1"
+DEFAULT_STEPFUN_BASE = "https://api.stepfun.com/v1"
 DEFAULT_STEPFUN_MODEL = "step-3.5-flash"
 
 
@@ -199,6 +199,7 @@ class StepFunLLMClient:
                     {"role": "user", "content": prompt},
                 ],
                 temperature=temperature,
+                extra_body={"thinking": {"type": "disabled"}},
             )
             latency_ms = (time.perf_counter() - start) * 1000
             text = response.choices[0].message.content or ""
