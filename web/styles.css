@@ -100,8 +100,8 @@ nav {
   padding: 0 10px;
   border: 0;
   border-radius: var(--radius);
-  background: transparent;
-  color: #9fb3aa;
+  background: #13201b;
+  color: #d7e3dc;
   font: inherit;
   font-weight: 800;
   text-align: left;
@@ -110,14 +110,14 @@ nav {
 
 .nav-btn span {
   width: 28px;
-  color: #5f776d;
+  color: #a8c2b6;
   font-size: 11px;
   font-weight: 900;
 }
 
 .nav-btn.active,
 .nav-btn:hover {
-  background: rgba(255, 255, 255, 0.09);
+  background: #26362f;
   color: #fff;
 }
 

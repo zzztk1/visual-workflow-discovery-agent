@@ -444,7 +444,9 @@ discoverBtn.addEventListener("click", discover);
 
 const apiBase = window.location.protocol === "file:" ? "http://127.0.0.1:7860" : "";
 
-fetch(`${apiBase}/api/health`)
+if (window.location.protocol === "file:") {
+  statusText.textContent = "静态预览，请启动本地服务";
+} else fetch(`${apiBase}/api/health`)
   .then((res) => res.json())
   .then((health) => {
     statusText.textContent = `服务就绪：${health.status}`;
