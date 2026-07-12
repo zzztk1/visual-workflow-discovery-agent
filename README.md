@@ -40,12 +40,12 @@ python -m venv .venv
 
 ```powershell
 .\.venv\Scripts\python -m unittest discover -s tests -v
+npm run qa:model
 ```
 
-当前本地结果：12 项测试中 11 项通过，1 项真实模型测试在未配置密钥时跳过。
+当前本地结果：12 项测试中 10 项通过，LangGraph 可选依赖与真实模型各跳过 1 项。`npm run qa:model` 会核验 StepFun provider token usage、候选工作流、trace 和报告，并生成不入库的 `MODEL_QA_RUN.json`；缺少密钥时该验收应失败。
 
 ## 深入阅读
 
 - [产品与技术案例拆解](docs/作品案例拆解.md)
 - [演示与运行手册](docs/演示与运行手册.md)
-
