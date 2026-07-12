@@ -422,8 +422,8 @@ textarea {
 
 .check input {
   flex: 0 0 auto;
-  width: 18px;
-  height: 18px;
+  width: 32px;
+  height: 32px;
   margin: 0;
   accent-color: var(--accent);
 }

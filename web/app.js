@@ -413,7 +413,7 @@ async function discover() {
   discoverBtn.disabled = true;
   statusText.textContent = "搜索发现中";
   try {
-    const res = await fetch(`/api/discovery?${configQuery().toString()}`);
+    const res = await fetch(`${apiBase}/api/discovery?${configQuery().toString()}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const payload = await res.json();
     renderDiscovery(payload);
@@ -429,7 +429,7 @@ async function discover() {
 async function deepDive(index) {
   statusText.textContent = `候选 ${index + 1} 深度拆解中`;
   try {
-    const res = await fetch(`/api/deep-dive?${configQuery({ lock_index: String(index) }).toString()}`);
+    const res = await fetch(`${apiBase}/api/deep-dive?${configQuery({ lock_index: String(index) }).toString()}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const payload = await res.json();
     renderDeepDive(payload);
@@ -442,7 +442,9 @@ async function deepDive(index) {
 
 discoverBtn.addEventListener("click", discover);
 
-fetch("/api/health")
+const apiBase = window.location.protocol === "file:" ? "http://127.0.0.1:7860" : "";
+
+fetch(`${apiBase}/api/health`)
   .then((res) => res.json())
   .then((health) => {
     statusText.textContent = `服务就绪：${health.status}`;
