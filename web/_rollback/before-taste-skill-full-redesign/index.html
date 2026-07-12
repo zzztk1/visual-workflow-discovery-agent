@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Restaurant Workflow Discovery Agent</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <p>Workflow Thief Arena</p>
+        <h1>餐饮工作流发现 Agent</h1>
+      </div>
+      <nav>
+        <button class="nav-btn active" data-page="config"><span>01</span>任务配置</button>
+        <button class="nav-btn" data-page="discovery"><span>02</span>搜索发现</button>
+        <button class="nav-btn" data-page="candidates"><span>03</span>候选工作流</button>
+        <button class="nav-btn" data-page="evidence"><span>04</span>公开证据</button>
+        <button class="nav-btn" data-page="deepdive"><span>05</span>深度拆解</button>
+        <button class="nav-btn" data-page="metrics"><span>06</span>指标与 Trace</button>
+        <button class="nav-btn" data-page="report"><span>07</span>报告导出</button>
+      </nav>
+      <div class="side-status">
+        <span>服务状态</span>
+        <strong id="statusText">服务检查中</strong>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Agent Review Console</p>
+          <h2 id="pageTitle">任务配置</h2>
+        </div>
+        <div class="top-actions">
+          <span id="runId" class="badge">未运行</span>
+          <button id="discoverBtn">运行搜索发现</button>
+        </div>
+      </header>
+
+      <section class="run-strip" aria-label="运行摘要">
+        <div>
+          <span>Source</span>
+          <strong id="sourceMode">等待运行</strong>
+        </div>
+        <div>
+          <span>候选数</span>
+          <strong id="candidateCount">-</strong>
+        </div>
+        <div>
+          <span>因果审计</span>
+          <strong id="auditStatus">待生成</strong>
+        </div>
+        <div>
+          <span>当前动作</span>
+          <strong>发现 → 锁定 → 深挖</strong>
+        </div>
+      </section>
+
+      <section id="page-config" class="page active">
+        <div class="control-grid">
+          <div class="panel command-panel">
+            <p class="eyebrow">Run Brief</p>
+            <h3>餐饮行业真实人工工作流发现</h3>
+            <p class="muted">
+              运行后只生成候选，不直接生成最终方案。你锁定一个候选后，下游流程、痛点、产品方案和风险都必须绑定这个候选。
+            </p>
+            <label>
+              行业
+              <input id="industry" value="餐饮行业 / 本地小餐馆" />
+            </label>
+            <label>
+              目标
+              <textarea id="goal">从公开互联网中发现一个真实存在的餐饮人工工作流，拆解流程、痛点和低效点，并设计 Agent 介入后的产品化方案。</textarea>
+            </label>
+            <label class="check">
+              <input id="liveSearch" type="checkbox" checked />
+              <span>启用 live search；失败时回退到公开证据池，并在 source_mode 中如实记录。</span>
+            </label>
+          </div>
+
+          <div class="panel audit-panel">
+            <p class="eyebrow">Screen Recording Path</p>
+            <h3>录屏验收路径</h3>
+            <div class="audit-list">
+              <div><strong>搜索发现</strong><span>展示 query、source_mode、候选数量。</span></div>
+              <div><strong>候选锁定</strong><span>展示 3 个候选，人工选择其中一个。</span></div>
+              <div><strong>证据绑定</strong><span>展示公开链接和 evidence_id。</span></div>
+              <div><strong>深度拆解</strong><span>展示原始流程、痛点、Agent 改造流程。</span></div>
+              <div><strong>因果审计</strong><span>展示方案没有串题，trace/metrics 可复盘。</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-discovery" class="page">
+        <div class="grid two">
+          <div class="panel">
+            <div class="section-head">
+              <h3>运行链路</h3>
+              <span class="badge">trace</span>
+            </div>
+            <div id="traceList" class="trace-list"></div>
+          </div>
+          <div class="panel">
+            <div class="section-head">
+              <h3>搜索 Query</h3>
+              <span class="badge">planner</span>
+            </div>
+            <div id="queryList" class="query-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-candidates" class="page">
+        <div class="panel flush-panel">
+          <div class="section-head">
+            <div>
+              <h3>候选工作流</h3>
+              <p class="muted">候选卡片展示分数、证据量、低效类型和连续步骤。点击后进入 human lock。</p>
+            </div>
+            <span class="badge">Human lock</span>
+          </div>
+          <div id="candidateGrid" class="candidate-grid"></div>
+        </div>
+      </section>
+
+      <section id="page-evidence" class="page">
+        <div class="panel flush-panel">
+          <div class="section-head">
+            <h3>公开证据库</h3>
+            <span class="badge">public links</span>
+          </div>
+          <div id="evidenceList" class="evidence-list"></div>
+        </div>
+      </section>
+
+      <section id="page-deepdive" class="page">
+        <div class="grid two">
+          <div class="panel">
+            <h3>锁定候选与方案</h3>
+            <div id="selectedBox" class="selected-box"></div>
+          </div>
+          <div class="panel risk-panel">
+            <h3>风险审核</h3>
+            <pre id="riskBox" class="compact-pre">选择候选后生成</pre>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-metrics" class="page">
+        <div class="grid two">
+          <div class="panel">
+            <h3>成本、效率与审计</h3>
+            <div id="metricsBox" class="metrics-grid"></div>
+          </div>
+          <div class="panel">
+            <h3>输出文件</h3>
+            <div id="outputLinks" class="output-links"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-report" class="page">
+        <div class="panel">
+          <div class="section-head">
+            <div>
+              <h3>最终报告预览</h3>
+              <p class="muted">对应提交文档主体，也可配合录屏展示。</p>
+            </div>
+          </div>
+          <pre id="reportPreview" class="report-preview">运行搜索发现后，再选择候选进行深度拆解。</pre>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

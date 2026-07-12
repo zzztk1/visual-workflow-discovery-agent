@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Restaurant Workflow Discovery Agent</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-row">
+          <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2.8 20 7.2v9.6l-8 4.4-8-4.4V7.2L12 2.8Z" />
+            <path d="M12 7.2 16.2 9.5v5L12 16.8 7.8 14.5v-5L12 7.2Z" />
+            <path d="M4.2 7.3 12 11.6l7.8-4.3" />
+            <path d="M12 11.6v9" />
+          </svg>
+          <h1>餐饮工作流发现 Agent</h1>
+        </div>
+      </div>
+      <nav>
+        <button class="nav-btn active" data-page="config"><span>01</span>任务配置</button>
+        <button class="nav-btn" data-page="discovery"><span>02</span>搜索发现</button>
+        <button class="nav-btn" data-page="candidates"><span>03</span>候选工作流</button>
+        <button class="nav-btn" data-page="evidence"><span>04</span>公开证据</button>
+        <button class="nav-btn" data-page="deepdive"><span>05</span>深度拆解</button>
+        <button class="nav-btn" data-page="metrics"><span>06</span>指标与 Trace</button>
+        <button class="nav-btn" data-page="report"><span>07</span>报告导出</button>
+      </nav>
+      <div class="side-status">
+        <span>服务状态</span>
+        <strong id="statusText">服务检查中</strong>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Agent 工作台</p>
+          <h2 id="pageTitle">任务配置</h2>
+        </div>
+        <div class="top-actions">
+          <span id="runId" class="badge">未运行</span>
+          <button id="discoverBtn">运行搜索发现</button>
+        </div>
+      </header>
+
+      <section class="run-strip" aria-label="运行摘要">
+        <div>
+          <svg class="run-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M3.5 12h17" />
+            <path d="M12 3c2.6 2.5 4 5.5 4 9s-1.4 6.5-4 9" />
+            <path d="M12 3c-2.6 2.5-4 5.5-4 9s1.4 6.5 4 9" />
+          </svg>
+          <span>来源模式</span>
+          <strong id="sourceMode">等待运行</strong>
+        </div>
+        <div>
+          <svg class="run-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m12 3 8 4-8 4-8-4 8-4Z" />
+            <path d="m20 12-8 4-8-4" />
+            <path d="m20 17-8 4-8-4" />
+          </svg>
+          <span>候选数</span>
+          <strong id="candidateCount">-</strong>
+        </div>
+        <div>
+          <svg class="run-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3 19 6v5.4c0 4.5-2.8 7.3-7 9.1-4.2-1.8-7-4.6-7-9.1V6l7-3Z" />
+            <path d="m8.8 12.1 2.2 2.2 5-5" />
+          </svg>
+          <span>因果审计</span>
+          <strong id="auditStatus">待生成</strong>
+        </div>
+        <div>
+          <svg class="run-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="6" cy="18" r="2" />
+            <circle cx="12" cy="12" r="2" />
+            <circle cx="18" cy="6" r="2" />
+            <path d="M7.5 16.5 10.5 13.5" />
+            <path d="M13.5 10.5 16.5 7.5" />
+          </svg>
+          <span>运行阶段</span>
+          <strong>发现 → 锁定 → 深挖</strong>
+        </div>
+      </section>
+
+      <section id="page-config" class="page active">
+        <div class="control-grid single">
+          <div class="panel command-panel">
+            <p class="eyebrow">任务输入</p>
+            <h3>餐饮行业真实人工工作流发现</h3>
+            <p class="muted">
+              这里配置的是本次发现任务的约束，不是修改 Agent 的内部流程。Agent 固定执行：搜索发现候选、候选评分、人工锁定、深度拆解、方案生成、风险审核和可观测导出。
+            </p>
+            <label>
+              1. 行业范围
+              <input id="industry" value="餐饮行业 / 本地小餐馆" />
+            </label>
+            <label>
+              2. 编排引擎
+              <select id="runner">
+                <option value="state-machine" selected>稳定状态机（默认兜底）</option>
+                <option value="langgraph">LangGraph StateGraph（增强）</option>
+              </select>
+              <span class="field-note">两种引擎复用同一批业务节点。LangGraph 版用于展示生产级 Agent 编排能力，状态机版用于现场稳定兜底。</span>
+            </label>
+            <label>
+              3. 发现约束
+              <textarea id="goal">请在餐饮行业中，从公开互联网资料里发现真实存在、由人工完成且包含连续步骤的工作流。候选工作流需要具备可打开的公开证据链接，优先关注小餐馆、外卖商家、门店运营、客诉处理、菜单维护、库存采购、营销物料制作等场景。
+
+发现阶段只生成候选工作流，不直接生成最终方案。每个候选需要说明：公开证据来源、原始人工步骤、低效点类型、人工重复/信息搬运/判断成本/沟通审核成本、Agent 介入价值、7 天 MVP 可验证性。请排除纯 AI 生图娱乐、无公开证据、单点工具功能、无法形成连续流程的内容。
+
+在人工锁定一个候选后，再围绕该候选生成深度拆解结果：原始工作流、痛点与低效点、Agent 改造后的流程、产品化方案、人工复核点、风险审核、成本与可观测指标。所有下游产物必须绑定被锁定候选，不允许串题或回退到固定模板。</textarea>
+              <span class="field-note">可修改：发现范围、关注场景、排除规则和证据要求。不可修改：Agent 固定运行链路和人工锁定机制。</span>
+            </label>
+            <label class="check">
+              <input id="liveSearch" type="checkbox" checked />
+              <span>4. 启用实时搜索；失败时回退到公开证据池，并在来源模式里如实记录。</span>
+            </label>
+            <label class="check">
+              <input id="llmEnabled" type="checkbox" checked />
+              <span>5. 启用大模型；生成、拆解、风险审核节点记录真实 provider token usage。</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-discovery" class="page">
+        <div class="grid two">
+          <div class="panel">
+            <div class="section-head">
+              <h3>运行链路</h3>
+              <span class="badge">链路</span>
+            </div>
+            <div id="traceList" class="trace-list"></div>
+          </div>
+          <div class="panel">
+            <div class="section-head">
+              <h3>搜索 Query</h3>
+              <span class="badge">查询规划</span>
+            </div>
+            <div id="queryList" class="query-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-candidates" class="page">
+        <div class="panel flush-panel">
+          <div class="section-head">
+            <div>
+              <h3>候选工作流</h3>
+              <p class="muted">候选卡片展示分数、证据量、低效类型和连续步骤。点击后进入 human lock。</p>
+            </div>
+            <span class="badge">人工锁定</span>
+          </div>
+          <div id="candidateGrid" class="candidate-grid"></div>
+        </div>
+      </section>
+
+      <section id="page-evidence" class="page">
+        <div class="panel flush-panel">
+          <div class="section-head">
+            <h3>公开证据库</h3>
+            <span class="badge">公开链接</span>
+          </div>
+          <div id="evidenceList" class="evidence-list"></div>
+        </div>
+      </section>
+
+      <section id="page-deepdive" class="page">
+        <div class="grid two">
+          <div class="panel">
+            <h3>锁定候选与方案</h3>
+            <div id="selectedBox" class="selected-box"></div>
+          </div>
+          <div class="panel risk-panel">
+            <h3>风险审核</h3>
+            <div id="riskBox" class="risk-list empty-state">选择候选后生成</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-metrics" class="page">
+        <div class="grid two">
+          <div class="panel">
+            <h3>成本、效率与审计</h3>
+            <div id="metricsBox" class="metrics-grid"></div>
+          </div>
+          <div class="panel">
+            <h3>输出文件</h3>
+            <div id="outputLinks" class="output-links"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-report" class="page">
+        <div class="panel">
+          <div class="section-head">
+            <div>
+              <h3>最终报告预览</h3>
+              <p class="muted">对应产品方案与运行报告主体。</p>
+            </div>
+          </div>
+          <div id="reportPreview" class="formal-report empty-state">运行搜索发现后，再选择候选进行深度拆解。</div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
