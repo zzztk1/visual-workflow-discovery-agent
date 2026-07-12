@@ -11,6 +11,7 @@ venv/
 output/
 outputs/
 work/
+web/_rollback/
 scripts/
 packaged_samples/
 SUBMISSION_README.md
